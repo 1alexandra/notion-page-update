@@ -1,2 +1,2 @@
 # notion-page-update
-Updating "Что посмотреть" page
+Updating "Что посмотреть" page on Heroku
