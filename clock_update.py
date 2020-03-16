@@ -1,8 +1,10 @@
 from notion.client import NotionClient
 from notion.block import VideoBlock
-
+from apscheduler.schedulers.blocking import BlockingScheduler
 COLL_URL = "https://www.notion.so/zhuav/0a23057cdbc141d8b20667573857d8be?v=9154c0f034bf45c3b1269e9d8a3cd0b2"
 COLL_YOUTUBE_URL = "https://www.notion.so/zhuav/3745c12264d7475f8cad58c789cfaf72?v=74df3a81051a4a19aca2de91d381ee71"
+
+sched = BlockingScheduler()
 
 def get_client(token_filename = 'token.txt'):
     with open(token_filename, 'r') as file:
@@ -119,14 +121,10 @@ def get_youtube_urls(coll_yt = COLL_YOUTUBE_URL):
         urls.append(row.rss)
     return urls            
 
-client = get_client()
-
-print('updating manga list')
-
-def get_date(item): 
+def get_date1(item): 
     return datetime.datetime.strptime(item.pubdate.text[:-6],
                                       '%a, %d %b %Y %H:%M:%S').date()
-def get_content(item):
+def get_content1(item):
     name, *episode = item.title.text.split(' - ') 
     name = name.split(' ')
     season = int(name[-1])
@@ -137,18 +135,13 @@ def get_content(item):
                   'season' : season, 
                   'link' : link
                  }
-
-update(['https://grouple.co/user/rss/1667979'], 
-       client, 'item', get_date, get_content)
-
-print('updating serials list')
-
-def get_date(item): 
+                 
+def get_date2(item): 
     return (datetime.datetime.strptime(item.pubdate.text[:-6], 
                                        '%a, %d %b %Y %H:%M:%S').date() 
             + datetime.timedelta(days=1))
 
-def get_content(item):
+def get_content2(item):
     *name, episode = item.title.text.split(' ')
     season, episode = [int(el) for el in episode[1:].split('e')]
     name = ' '.join(name)
@@ -156,45 +149,46 @@ def get_content(item):
                   'season' : season
                  }
 
-update(['http://api.myshows.ru/rss/1000324/episodes/aired/'],
-       client, 'item', get_date, get_content)
-
-print('updating youtube list')
-
-def get_date(item): 
+def get_date3(item): 
     return datetime.datetime.strptime(item.published.text[:10], 
                                                '%Y-%m-%d').date()
 
-def get_content(item):
+def get_content3(item):
     name = item.author.find('name').text + ': ' + item.title.text
     link = item.link.get('href')
     return name, {'link'  : link}
 
-def get_video(item):
+def get_video3(item):
     return item.link.get('href')
-
-update(get_youtube_urls(), client, 'entry', get_date, get_content, get_video)
-
-print('updating shows list')
-def get_date(item):
+    
+def get_date4(item):
     return datetime.datetime.strptime(item.text.split()[-1],
                                       '%d.%m.%Y').date()
 
-def get_content(item):
+def get_content4(item):
     name = 'КВН: ' + item.text[:-27]
     link = 'https://www.1tv.ru/shows/kvn/vypuski'
     return name, {'link': link}
-    
-update(['https://www.1tv.ru/shows/kvn/vypuski'], 
-       client, 'h3', get_date, get_content)    
 
-def get_content(item):
+def get_content5(item):
     name = 'ЧГК: ' + item.text[:-39]
     link = 'https://www.1tv.ru/shows/chto-gde-kogda/vypuski'
     return name, {'link': link}
+    
 
-update(['https://www.1tv.ru/shows/chto-gde-kogda/vypuski'], 
-       client, 'h3', get_date, get_content)
-
-print('complete')
-update_last_date(client)
+@sched.scheduled_job('interval', minutes=120)
+def main():
+    client = get_client()
+    update(['https://grouple.co/user/rss/1667979'], 
+           client, 'item', get_date1, get_content1)
+    update(['http://api.myshows.ru/rss/1000324/episodes/aired/'],
+           client, 'item', get_date2, get_content2)
+    update(get_youtube_urls(), 
+           client, 'entry', get_date3, get_content3, get_video3)
+    update(['https://www.1tv.ru/shows/kvn/vypuski'], 
+           client, 'h3', get_date4, get_content4)    
+    update(['https://www.1tv.ru/shows/chto-gde-kogda/vypuski'], 
+           client, 'h3', get_date4, get_content5)
+    update_last_date(client)
+    
+sched.start()
