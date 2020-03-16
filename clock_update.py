@@ -112,7 +112,8 @@ def get_youtube_info(url):
     postfix = '_id' if tag != 'user' else ''
     xml = 'https://www.youtube.com/feeds/videos.xml?' + tag + postfix + '=' + id_
     soup = get_soup(xml)
-    name = soup.find('name').text
+    cls = 'title' if tag == 'playlist' else 'title'
+    name = soup.find(cls).text
     return name, tag, xml
 
 def get_youtube_urls(client, coll_yt = COLL_YOUTUBE_URL):
@@ -164,9 +165,8 @@ def get_content3(item):
 def get_video3(item):
     return item.link.get('href')
 
-#@sched.scheduled_job('interval', minutes=1)
+@sched.scheduled_job('interval', minutes=120)
 def main():
-    print('main started', datetime.datetime.now())
     client = get_client()
     update(['https://grouple.co/user/rss/1667979'], 
            client, 'item', get_date1, get_content1)
@@ -175,10 +175,5 @@ def main():
     update(get_youtube_urls(client), 
            client, 'entry', get_date3, get_content3, get_video3)
     update_last_date(client)
-    print('main comleted', datetime.datetime.now())
     
-#print('START', datetime.datetime.now())
-#sched.start()
-#print('END', datetime.datetime.now())
-
-main()
+sched.start()
