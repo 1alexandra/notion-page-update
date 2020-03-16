@@ -1,1 +1,1 @@
-clock: python clock_update.py
+worker: python clock_update.py
