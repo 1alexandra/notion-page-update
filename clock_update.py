@@ -1,14 +1,19 @@
 from notion.client import NotionClient
 from notion.block import VideoBlock
 from apscheduler.schedulers.blocking import BlockingScheduler
+
 COLL_URL = "https://www.notion.so/zhuav/0a23057cdbc141d8b20667573857d8be?v=9154c0f034bf45c3b1269e9d8a3cd0b2"
 COLL_YOUTUBE_URL = "https://www.notion.so/zhuav/3745c12264d7475f8cad58c789cfaf72?v=74df3a81051a4a19aca2de91d381ee71"
+TOKEN_PATH = ''
 
 sched = BlockingScheduler()
 
-def get_client(token_filename = 'token.txt'):
-    with open(token_filename, 'r') as file:
-        token = file.read()
+def get_client(token_filename = TOKEN_PATH):
+    if token_filename:
+        with open(token_filename, 'r') as file:
+            token = file.read()
+    else:
+        token = os.environ['TOKEN_V2']
     return NotionClient(token_v2=token)
 
 def get_rows(client, coll_url = COLL_URL):
@@ -16,7 +21,6 @@ def get_rows(client, coll_url = COLL_URL):
     return cv.default_query().execute(), cv
 
 def update_row(row, kwargs):
-    print('Updating:', row.title)
     if 'episode' in kwargs.keys():
         row.episode = kwargs['episode']
     if 'season' in kwargs.keys():
@@ -106,13 +110,12 @@ def get_youtube_info(url):
     sep = '=' if tag == 'playlist' else '/'
     id_ = url.split(sep)[-1]
     postfix = '_id' if tag != 'user' else ''
-    xml = 'https://www.youtube.com/feeds/videos.xml?' + tag + '=' + postfix + id_
+    xml = 'https://www.youtube.com/feeds/videos.xml?' + tag + postfix + '=' + id_
     soup = get_soup(xml)
-    name = soup.find('name').text 
-    rss = get_youtube_rss(id_, tag)
-    return name, tag, rss
+    name = soup.find('name').text
+    return name, tag, xml
 
-def get_youtube_urls(coll_yt = COLL_YOUTUBE_URL):
+def get_youtube_urls(client, coll_yt = COLL_YOUTUBE_URL):
     rows_yt, cv_yt = get_rows(client, coll_yt)
     urls = []
     for row in rows_yt:
@@ -160,35 +163,22 @@ def get_content3(item):
 
 def get_video3(item):
     return item.link.get('href')
-    
-def get_date4(item):
-    return datetime.datetime.strptime(item.text.split()[-1],
-                                      '%d.%m.%Y').date()
 
-def get_content4(item):
-    name = 'КВН: ' + item.text[:-27]
-    link = 'https://www.1tv.ru/shows/kvn/vypuski'
-    return name, {'link': link}
-
-def get_content5(item):
-    name = 'ЧГК: ' + item.text[:-39]
-    link = 'https://www.1tv.ru/shows/chto-gde-kogda/vypuski'
-    return name, {'link': link}
-    
-
-@sched.scheduled_job('interval', minutes=120)
+#@sched.scheduled_job('interval', minutes=1)
 def main():
+    print('main started', datetime.datetime.now())
     client = get_client()
     update(['https://grouple.co/user/rss/1667979'], 
            client, 'item', get_date1, get_content1)
     update(['http://api.myshows.ru/rss/1000324/episodes/aired/'],
            client, 'item', get_date2, get_content2)
-    update(get_youtube_urls(), 
+    update(get_youtube_urls(client), 
            client, 'entry', get_date3, get_content3, get_video3)
-    update(['https://www.1tv.ru/shows/kvn/vypuski'], 
-           client, 'h3', get_date4, get_content4)    
-    update(['https://www.1tv.ru/shows/chto-gde-kogda/vypuski'], 
-           client, 'h3', get_date4, get_content5)
     update_last_date(client)
+    print('main comleted', datetime.datetime.now())
     
-sched.start()
+#print('START', datetime.datetime.now())
+#sched.start()
+#print('END', datetime.datetime.now())
+
+main()
