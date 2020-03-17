@@ -1,3 +1,5 @@
+import os
+
 from notion.client import NotionClient
 from notion.block import VideoBlock
 from apscheduler.schedulers.blocking import BlockingScheduler
