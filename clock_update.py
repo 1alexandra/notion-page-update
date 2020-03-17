@@ -167,7 +167,7 @@ def get_content3(item):
 def get_video3(item):
     return item.link.get('href')
 
-@sched.scheduled_job('interval', minutes=120)
+@sched.scheduled_job('interval', minutes=5)
 def main():
     client = get_client()
     update(['https://grouple.co/user/rss/1667979'], 
