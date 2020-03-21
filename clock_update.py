@@ -48,11 +48,12 @@ def get_last_date(client, coll_url = COLL_URL):
         
 def update_last_date(client, coll_url = COLL_URL):
     rows, cv = get_rows(client, coll_url)
-    today = datetime.datetime.now().date()
+    old = datetime.datetime.now().date() - datetime.timedelta(days = 7)
     for row in rows:
         if row.title == 'last_date.txt':
             row.date = today
-        elif row.date is not None and row.date.start < today and row.seen == 'yes':
+        elif (row.date is not None and row.date.start < old 
+              and row.seen == 'yes'):
             row.remove()
         
 from bs4 import BeautifulSoup
