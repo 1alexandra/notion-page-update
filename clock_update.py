@@ -4,9 +4,12 @@ from notion.client import NotionClient
 from notion.block import VideoBlock
 from apscheduler.schedulers.blocking import BlockingScheduler
 
+mode = 'local'
+mode = 'heroku'
+
 COLL_URL = "https://www.notion.so/zhuav/0a23057cdbc141d8b20667573857d8be?v=9154c0f034bf45c3b1269e9d8a3cd0b2"
 COLL_YOUTUBE_URL = "https://www.notion.so/zhuav/3745c12264d7475f8cad58c789cfaf72?v=74df3a81051a4a19aca2de91d381ee71"
-TOKEN_PATH = ''
+TOKEN_PATH = '../token.txt' if mode == 'local' else ''
 
 sched = BlockingScheduler()
 
@@ -48,7 +51,8 @@ def get_last_date(client, coll_url = COLL_URL):
         
 def update_last_date(client, coll_url = COLL_URL):
     rows, cv = get_rows(client, coll_url)
-    old = datetime.datetime.now().date() - datetime.timedelta(days = 7)
+    today = datetime.datetime.now().date()
+    old = today - datetime.timedelta(days = 1)
     for row in rows:
         if row.title == 'last_date.txt':
             row.date = today
@@ -78,8 +82,12 @@ def update(sourse_urls, client, item_name, get_date, get_content, get_video = No
             if name in added_names:
                 continue
             finded_row = None
+            video_url = get_video(item) if get_video is not None else None
             for row in rows:
-                if row.title == name:
+                if (row.title == name or 
+                    video_url is not None and 
+                    row.link == video_url 
+                ):
                     finded_row = row
                     break
             if finded_row is not None and (
@@ -97,9 +105,9 @@ def update(sourse_urls, client, item_name, get_date, get_content, get_video = No
             if finded_row is None:
                 finded_row = cv.collection.add_row(title=name)
                 added_names.append(name)
-                if get_video is not None:
+                if video_url is not None:
                     video = finded_row.children.add_new(VideoBlock)
-                    video.set_source_url(get_video(item))
+                    video.set_source_url(video_url)
             update_row(finded_row, kwargs)
             finded_row.date = cur_date
 
@@ -178,5 +186,6 @@ def main():
     update(get_youtube_urls(client), 
            client, 'entry', get_date3, get_content3, get_video3)
     update_last_date(client)
-    
+
+main()    
 sched.start()
