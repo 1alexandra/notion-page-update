@@ -4,4 +4,5 @@ django-heroku
 notion
 lxml
 beautifulsoup4
+yaml
 APScheduler==3.0.0
