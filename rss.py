@@ -86,7 +86,11 @@ class SeriesRSS(BaseRSS):
 
     def get_episode(self, el):
         episode = el.title.text.split(' ')[-1]
-        return int(episode[1:].split('e')[1])
+        try:
+            e = int(episode[1:].split('e')[1])
+        except Exception:
+            return None
+        return e
 
     def get_date(self, el):
         date = datetime.strptime(el.pubdate.text[:-6],
