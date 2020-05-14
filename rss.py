@@ -78,7 +78,11 @@ class SeriesRSS(BaseRSS):
 
     def get_season(self, el):
         episode = el.title.text.split(' ')[-1]
-        return int(episode[1:].split('e')[0])
+        try:
+            s = int(episode[1:].split('e')[0])
+        except Exception:
+            return None
+        return s
 
     def get_episode(self, el):
         episode = el.title.text.split(' ')[-1]
