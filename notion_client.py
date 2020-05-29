@@ -12,7 +12,7 @@ def find_file(filename):
             for file in files:
                 if file == filename:
                     return root + os.sep + file
-    return None
+    raise Exception('find_file error')
 
 
 def get_client():
@@ -25,28 +25,38 @@ def get_client():
                 token = file.read()
         else:
             return None
-    return NotionClient(token_v2=token)
+    try:
+        return NotionClient(token_v2=token)
+    except Exception:
+        raise Exception('Error: wrong token_v2')
 
 
 def update_row(row, kwargs):
     for key, val in kwargs.items():
         if val:
-            row.set_property(key, val)
+            try:
+                row.set_property(key, val)
+            except Exception:
+                pass
 
 
 def get_last_date(rows):
     for row in rows:
         if row.title == 'last_date.txt':
             return row.date.start
-    return None
+    raise Exception('get_last_date error')
 
 
 def update_last_date(rows):
     today = datetime.now().date()
     old = today - timedelta(days=1)
+    updated = False
     for row in rows:
         if row.title == 'last_date.txt':
             row.date = today
+            updated = True
         elif (row.date is not None and row.date.start <= old
               and row.seen == 'yes'):
             row.remove()
+    if not updated:
+        raise Exception('update_last_date error')

@@ -1,3 +1,4 @@
+import sys
 import yaml
 from apscheduler.schedulers.blocking import BlockingScheduler
 
@@ -6,8 +7,12 @@ from youtube import get_youtube_urls
 from rss import MangaRSS, SeriesRSS, YouTubeRSS
 from update import update
 
-# MODE = 'local'
-MODE = 'heroku'
+minutes = 120
+if len(sys.argv) == 2:
+    MODE = 'heroku'
+    minutes = int(sys.argv[1])
+else:
+    MODE = 'local'
 
 with open('constants.yaml') as f:
     dumped = yaml.safe_load(f)

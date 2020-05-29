@@ -4,17 +4,23 @@ from notion_client import update_row
 
 
 def is_equal(row, kwargs):
-    return (row.title == kwargs['title']
-            or row.link and kwargs['link']
-            and row.link == kwargs['link'])
+    try:
+        return (row.title == kwargs['title']
+                or row.link and kwargs['link']
+                and row.link == kwargs['link'])
+    except Exception:
+        return False
 
 
 def old_episode(row, kwargs):
-    return (row.season and kwargs['season']
-            and int(row.season) > kwargs['season']
-            or row.season == kwargs['season']
-            and row.episode and kwargs['episode']
-            and int(row.episode) > kwargs['episode'])
+    try:
+        return (row.season and kwargs['season']
+                and int(row.season) > kwargs['season']
+                or row.season == kwargs['season']
+                and row.episode and kwargs['episode']
+                and int(row.episode) > kwargs['episode'])
+    except Exception:
+        return False
 
 
 def update(cv, rows, rss, add_video=False):
