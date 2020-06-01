@@ -20,7 +20,7 @@ URLS = dumped['URLS']
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', minutes=240)
+@sched.scheduled_job('interval', minutes=minutes)
 def main():
     client = get_client()
     cv = client.get_collection_view(URLS['WHAT_TO_WATCH'])

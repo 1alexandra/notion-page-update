@@ -55,12 +55,12 @@ def update_last_date(rows):
         if row.title == 'last_date.txt':
             row.date = today
             updated = True
-        elif (row.date is not None and row.date.start <= old and row.seen):
+        elif row.date is not None and row.seen:
             if row.episode is not None:
                 row.episode = int(row.episode) + 1
                 row.seen = False
                 row.date = None
-            else:
+            elif row.date.start <= old:
                 row.remove()
     if not updated:
         raise Exception('update_last_date error')
