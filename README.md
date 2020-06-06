@@ -1,2 +1,2 @@
-# notion-page-update
-Updating "Что посмотреть" page on Heroku
+# Update watching & reading list on Notion using Heroku
+Require <<notion>> python module.
