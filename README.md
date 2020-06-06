@@ -1,2 +1,2 @@
 # Update watching & reading list on Notion using Heroku
-Require <<notion>> python module.
+Require notion python module.
