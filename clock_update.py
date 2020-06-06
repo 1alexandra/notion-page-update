@@ -35,6 +35,7 @@ def main():
     update_last_date(rows)
 
 
-main()
-if MODE == 'heroku':
-    sched.start()
+if __name__ == "__main__":
+    main()
+    if MODE == 'heroku':
+        sched.start()
