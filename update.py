@@ -1,4 +1,5 @@
 from notion.block import VideoBlock
+from notion.collection import NotionDate
 
 from notion_client import update_row
 
@@ -42,3 +43,8 @@ def update(cv, rows, rss, add_video=False):
         elif finded_row.date or old_episode(finded_row, kwargs):
             continue
         update_row(finded_row, kwargs)
+
+
+def log_result(cv, traceback, start_datetime, finish_datetime, timezone):
+    row = cv.collection.add_row(title=traceback)
+    row.date = NotionDate(start_datetime, finish_datetime, timezone)

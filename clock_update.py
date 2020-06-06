@@ -1,11 +1,13 @@
 import sys
 import yaml
+import traceback
+from datetime import datetime, timedelta, timezone
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from notion_client import get_client, get_last_date, update_last_date
 from youtube import get_youtube_urls
 from rss import MangaRSS, SeriesRSS, YouTubeRSS
-from update import update
+from update import update, log_result
 
 minutes = 120
 if len(sys.argv) == 2:
@@ -20,9 +22,7 @@ URLS = dumped['URLS']
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', minutes=minutes)
-def main():
-    client = get_client()
+def processing(client):
     cv = client.get_collection_view(URLS['WHAT_TO_WATCH'])
     rows = cv.default_query().execute()
     cv_yt = client.get_collection_view(URLS['YOUTUBE_LIST'])
@@ -33,6 +33,25 @@ def main():
     for url in get_youtube_urls(rows_yt):
         update(cv, rows, YouTubeRSS(url, last_date), True)
     update_last_date(rows)
+
+
+@sched.scheduled_job('interval', minutes=minutes)
+def main():
+    zone = timezone(timedelta(hours=3))
+    tb = 'Success'
+    start = datetime.now(tz=zone)
+    client = get_client()
+    try:
+        print('PROCESSING')
+        processing(client)
+    except Exception:
+        print('EXCEPTION')
+        tb = traceback.format_exc()
+    finally:
+        print('LOGGING')
+        cv_log = client.get_collection_view(URLS['LOGS_TABLE'])
+        finish = datetime.now(tz=zone)
+        log_result(cv_log, tb, start, finish, zone)
 
 
 if __name__ == "__main__":
