@@ -35,3 +35,14 @@ def update_tody(rows):
             fill_tody_next(row)
             row.done = False
         row.indicator = get_indicator(date - row.when.start, days)
+
+
+def update_private(rows):
+    for row in rows:
+        date = datetime.today().date()
+        days = row.days
+        if row.done:
+            row.last = date
+            row.done = False
+        row.when = row.last.start + timedelta(days=days)
+        row.indicator = get_indicator(date - row.when.start, days)

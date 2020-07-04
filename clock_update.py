@@ -8,7 +8,7 @@ from notion_client import get_client, get_last_date, update_last_date
 from youtube import get_youtube_urls
 from rss import MangaRSS, SeriesRSS, YouTubeRSS
 from update import update, log_result
-from tody_killer import update_tody
+from tody_killer import update_tody, update_private
 
 minutes = 120
 if len(sys.argv) == 2:
@@ -30,6 +30,8 @@ def processing(client):
     rows_yt = cv_yt.default_query().execute()
     cv_td = client.get_collection_view(URLS['TODY_KILLER'])
     rows_td = cv_td.default_query().execute()
+    cv_pr = client.get_collection_view(URLS['PRIVATE'])
+    rows_pr = cv_pr.default_query().execute()
     last_date = get_last_date(rows)
     update(cv, rows, MangaRSS(last_date), False)
     update(cv, rows, SeriesRSS(last_date), False)
@@ -37,6 +39,7 @@ def processing(client):
         update(cv, rows, YouTubeRSS(url, last_date), True)
     update_last_date(rows)
     update_tody(rows_td)
+    update_private(rows_pr)
 
 
 @sched.scheduled_job('interval', minutes=minutes)
