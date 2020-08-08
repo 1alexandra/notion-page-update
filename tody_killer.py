@@ -10,8 +10,8 @@ def get_next_able(able_list, prev):
 
 def get_indicator(delta, days):
     cur_dates = delta.days
-    indicator_list = ['clean', 'early', 'time', 'late', 'dirty']
-    steps = [- 2 * days / 3, - days / 3, days / 3, days]
+    indicator_list = ['clean', 'early', 'soon', 'time', 'late', 'dirty']
+    steps = [- 2 * days / 3, - days / 3, 0, days / 3, 2 * days / 3]
     for i, step in enumerate(steps):
         if cur_dates < steps[i]:
             return indicator_list[i]
