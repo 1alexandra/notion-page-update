@@ -31,6 +31,12 @@ def get_client():
         raise Exception('Error: wrong token_v2')
 
 
+def get_cv_rows(client, url):
+    cv = client.get_collection_view(url)
+    rows = cv.default_query().execute()
+    return cv, rows
+
+
 def update_row(row, kwargs):
     for key, val in kwargs.items():
         if val:

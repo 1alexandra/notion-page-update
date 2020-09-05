@@ -4,11 +4,14 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from notion_client import get_client, get_last_date, update_last_date
+from notion_client import get_client
+from notion_client import get_cv_rows
+from notion_client import get_last_date, update_last_date
 from youtube import get_youtube_urls
 from rss import MangaRSS, SeriesRSS, YouTubeRSS
 from update import update, log_result
 from tody_killer import update_tody, update_private
+from weather import update_weather
 
 minutes = 120
 if len(sys.argv) == 2:
@@ -24,14 +27,11 @@ sched = BlockingScheduler()
 
 
 def processing(client):
-    cv = client.get_collection_view(URLS['WHAT_TO_WATCH'])
-    rows = cv.default_query().execute()
-    cv_yt = client.get_collection_view(URLS['YOUTUBE_LIST'])
-    rows_yt = cv_yt.default_query().execute()
-    cv_td = client.get_collection_view(URLS['TODY_KILLER'])
-    rows_td = cv_td.default_query().execute()
-    cv_pr = client.get_collection_view(URLS['PRIVATE'])
-    rows_pr = cv_pr.default_query().execute()
+    cv, rows = get_cv_rows(client, URLS['WHAT_TO_WATCH'])
+    _, rows_yt = get_cv_rows(client, URLS['YOUTUBE_LIST'])
+    _, rows_td = get_cv_rows(client, URLS['TODY_KILLER'])
+    _, rows_pr = get_cv_rows(client, URLS['PRIVATE'])
+    cv_w, rows_w = get_cv_rows(client, URLS['WEATHER'])
     last_date = get_last_date(rows)
     update(cv, rows, MangaRSS(last_date), False)
     try:
@@ -43,6 +43,7 @@ def processing(client):
     update_last_date(rows)
     update_tody(rows_td)
     update_private(rows_pr)
+    update_weather(cv_w, rows_w, key_num=2)
 
 
 @sched.scheduled_job('interval', minutes=minutes)

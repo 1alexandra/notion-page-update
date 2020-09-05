@@ -10,7 +10,10 @@ def is_equal(row, kwargs):
                 or row.link and kwargs['link']
                 and row.link == kwargs['link'])
     except Exception:
-        return False
+        try:
+            return row.title == kwargs['title']
+        except Exception:
+            return False
 
 
 def old_episode(row, kwargs):

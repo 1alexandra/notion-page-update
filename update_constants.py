@@ -12,3 +12,39 @@ to_dump = {'URLS': urls}
 
 with open('constants.yaml', 'w') as f:
     yaml.dump(to_dump, f)
+
+
+workdays = list(range(5))
+holidays = list(range(5, 7))
+week = list(range(7))
+never = []
+need_weather = {
+    'home': {
+        'morning': workdays,
+        'day': holidays,
+        'evening': week,
+        'night': never
+    },
+    'work': {
+        'morning': workdays,
+        'day': workdays,
+        'evening': workdays,
+        'night': never
+    }
+}
+
+time_parts = {
+    'night': list(range(0, 6)),
+    'morning': list(range(6, 12)),
+    'day': list(range(12, 18)),
+    'evening': list(range(18, 24))
+}
+
+
+to_dump = {
+    'time_parts': time_parts,
+    'need_weather': need_weather
+}
+
+with open('need_weather.yaml', 'w') as f:
+    yaml.dump(to_dump, f)
