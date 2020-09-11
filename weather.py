@@ -4,6 +4,7 @@ import requests
 import yaml
 
 from notion_client import update_row
+from update import is_equal
 
 
 def weather_api_url(geo):
@@ -91,6 +92,13 @@ def add_forecast(cv, rows, geo_name, geo, yandex_api_key):
             'url': forecast_url,
             'icon': icon_path + f'{kwargs["icon"]}.svg',
         })
+        finded_row = None
+        for row in rows:
+            if is_equal(row, kwargs):
+                finded_row = row
+                break
+        if finded_row is not None:
+            continue
         row = cv.collection.add_row(title=kwargs['title'])
         update_row(row, kwargs)
 
