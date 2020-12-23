@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import pandas as pd
 
 
 def get_next_able(able_list, prev):
@@ -6,6 +7,14 @@ def get_next_able(able_list, prev):
         if str(able) == str(prev):
             return able_list[(i + 1) % len(able_list)]
     return able_list[0]
+
+
+def date_from_notion(dt):
+    try:
+        dt_ = dt.start
+    except Exception:
+        dt_ = dt
+    return pd.to_datetime(dt_).dt.date()
 
 
 def get_indicator(delta, days):
@@ -21,7 +30,8 @@ def get_indicator(delta, days):
 def fill_tody_next(row):
     days = row.weeks * 7
     row.who = get_next_able(row.able, row.prev)
-    row.when = row.last.start + timedelta(days=days)
+    last = date_from_notion(row.last)
+    row.when = last + timedelta(days=days)
 
 
 def update_tody(rows):
@@ -34,7 +44,8 @@ def update_tody(rows):
             row.last = date
             fill_tody_next(row)
             row.done = False
-        row.indicator = get_indicator(date - row.when.start, days)
+        when = date_from_notion(row.when)
+        row.indicator = get_indicator(date - when, days)
 
 
 def update_private(rows):
@@ -44,5 +55,7 @@ def update_private(rows):
         if row.done:
             row.last = date
             row.done = False
-        row.when = row.last.start + timedelta(days=days)
-        row.indicator = get_indicator(date - row.when.start, days)
+        last = date_from_notion(row.last)
+        row.when = last + timedelta(days=days)
+        when = date_from_notion(row.when)
+        row.indicator = get_indicator(date - when, days)
