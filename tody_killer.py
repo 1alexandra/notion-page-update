@@ -14,7 +14,7 @@ def date_from_notion(dt):
         dt_ = dt.start
     except Exception:
         dt_ = dt
-    return pd.to_datetime(dt_).dt.date()
+    return pd.to_datetime(dt_).date()
 
 
 def get_indicator(delta, days):
