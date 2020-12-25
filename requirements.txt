@@ -6,3 +6,4 @@ lxml
 beautifulsoup4
 pyyaml
 APScheduler==3.0.0
+pandas
