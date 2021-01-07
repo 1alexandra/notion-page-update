@@ -34,7 +34,10 @@ def processing(client):
     cv_w, rows_w = get_cv_rows(client, URLS['WEATHER'])
     last_date = get_last_date(rows)
     update(cv, rows, MangaRSS(last_date), False)
-    update(cv, rows, SeriesRSS(last_date), False)
+    try:
+        update(cv, rows, SeriesRSS(last_date), False)
+    except Exception:
+        pass
     for url in get_youtube_urls(rows_yt):
         update(cv, rows, YouTubeRSS(url, last_date), True)
     update_last_date(rows)
