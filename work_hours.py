@@ -15,36 +15,45 @@ URLS = dumped['URLS']
 WORKS = dumped['work_activities']
 
 
-def today_work_time(cv, rows):
+def get_work_time(date):
     param_request = {
         'key': os.environ['rescue_key'],
         'format': 'json',
+        'restrict_begin': date,
+        'restrict_end': date,
     }
     response = requests.get(URLS['RESCUE_TIME'], params=param_request)
     response = response.json()
 
     result = pd.DataFrame(response['rows'], columns=response['row_headers'])
     five_mins = result['Time Spent (seconds)'] / 300
-    rounded = five_mins.apply(round) * 300 
+    rounded = five_mins.apply(round) * 300
     result['Time'] = rounded.apply(pd.Timedelta, args=['s'])
-    return result.loc[np.isin(result.Activity, WORKS), 'Time'].sum()
+    work_result = result[np.isin(result.Activity, WORKS)]
+    if len(work_result) > 0:
+        return work_result.Time.sum()
+    return pd.Timedelta(days=0)
 
 
 def week_start(date):
     return date - timedelta(days=date.weekday())
 
 
-def update_work_hours(cv, rows, rescue_key):
-    work_time = today_work_time(rescue_key)
-    date = datetime.today().date()
+def update_work_hours(cv, rows, date=None, log=False):
+    date = date if date is not None else datetime.today().date()
+    if date.weekday() >= 5:
+        return
     week = week_start(date)
+    work_time = get_work_time(date)
     kwargs = {
         'title': date.strftime('%d %B %Y, %A'),
         'date': date,
         'week': week,
-        'hours': work_time.components.hours,
-        'minutes': work_time.components.minutes,
+        'hours': work_time.components.hours or 0,
+        'minutes': work_time.components.minutes or 0,
     }
+    if log:
+        print(kwargs)
     finded_row = None
     for row in rows:
         if is_equal(row, kwargs):

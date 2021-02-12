@@ -13,6 +13,7 @@ from update import update, log_result
 from tody_killer import update_tody, update_private
 from weather import update_weather
 from work_hours import update_work_hours
+from plot_work_hours import plot_work_hours
 
 minutes = 120
 if len(sys.argv) == 2:
@@ -47,6 +48,9 @@ def processing(client):
     # update_private(rows_pr)
     # update_weather(cv_w, rows_w, key_num=2)
     update_work_hours(cv_h, rows_h)
+
+    cv_h, rows_h = get_cv_rows(client, URLS['WORK_HOURS'])
+    plot_work_hours(rows_h)
 
 
 @sched.scheduled_job('interval', minutes=minutes)
