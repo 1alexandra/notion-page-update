@@ -6,4 +6,7 @@ lxml
 beautifulsoup4
 pyyaml
 APScheduler==3.0.0
+requests
 pandas
+chart_studio
+plotly
