@@ -55,4 +55,4 @@ def plot_work_hours(rows):
         ),
     ]
     plotly_setup()
-    py.iplot(data, filename='example', sharing='public')
+    py.plot(data, filename='example', sharing='public')
