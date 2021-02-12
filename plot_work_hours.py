@@ -10,13 +10,13 @@ from work_hours import week_start
 
 
 def plotly_setup():
-    set_config_file(
-        plotly_domain="https://plotly.com", 
-        plotly_api_domain="https://api.plotly.com"
-    )
     user = os.environ['plotly_user']
     key = os.environ['plotly_key']
     py.sign_in(username=user, api_key=key)
+    set_config_file(
+        plotly_domain="https://plotly.com",
+        plotly_api_domain="https://api.plotly.com"
+    )
 
 
 def work_hours_daily(wh_rows):
@@ -38,7 +38,6 @@ def work_hours_weekly(daily):
 
 
 def plot_work_hours(rows):
-    plotly_setup()
     daily = work_hours_daily(rows)
     weekly = work_hours_weekly(daily)
     data = [
@@ -55,4 +54,5 @@ def plot_work_hours(rows):
             name='Weeks',
         ),
     ]
+    plotly_setup()
     py.iplot(data, filename='example', sharing='public')
