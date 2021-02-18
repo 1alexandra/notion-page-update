@@ -6,7 +6,7 @@ import chart_studio.plotly as py
 from chart_studio.tools import set_config_file
 import plotly.graph_objects as go
 
-from work_hours import week_start
+from work_hours import week_start, month_start
 
 
 def plotly_setup():
@@ -37,9 +37,15 @@ def work_hours_weekly(daily):
     return daily.groupby('Week')['Hours'].mean().replace(0, np.nan)
 
 
+def work_hours_monthly(daily):
+    daily['Month'] = daily.Date.apply(month_start)
+    return daily.groupby('Month')['Hours'].mean().replace(0, np.nan)
+
+
 def plot_work_hours(rows):
     daily = work_hours_daily(rows)
     weekly = work_hours_weekly(daily)
+    monthly = work_hours_monthly(daily)
     data = [
         go.Scatter(
             x=daily.Date,
@@ -52,6 +58,16 @@ def plot_work_hours(rows):
             y=weekly.values,
             mode='lines+markers',
             name='Weeks',
+        ),
+        go.Scatter(
+            x=monthly.index,
+            y=monthly.values,
+            mode='lines',
+            name='Months',
+            line={
+                'dash': 'dash',
+                'color': 'firebrick',
+            },
         ),
     ]
     plotly_setup()

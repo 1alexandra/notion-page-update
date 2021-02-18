@@ -39,6 +39,10 @@ def week_start(date):
     return date - timedelta(days=date.weekday())
 
 
+def month_start(date):
+    return date - pd.Timedelta(days=date.day-1)
+
+
 def update_work_hours(cv, rows, date=None, log=False):
     date = date if date is not None else datetime.today().date()
     if date.weekday() >= 5:
