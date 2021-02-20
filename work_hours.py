@@ -13,6 +13,10 @@ with open('constants.yaml') as f:
     dumped = yaml.safe_load(f)
 URLS = dumped['URLS']
 WORKS = dumped['work_activities']
+with open('work_days.yaml') as f:
+	work_calendar = yaml.safe_load(f)
+for key in work_calendar:
+	work_calendar[key] = [pd.to_datetime(dt).date() for dt in work_calendar[key]]
 
 
 def get_work_time(date):
@@ -45,7 +49,9 @@ def month_start(date):
 
 def update_work_hours(cv, rows, date=None, log=False):
     date = date if date is not None else datetime.today().date()
-    if date.weekday() >= 5:
+    if date.weekday() >= 5 and date not in work_calendar['work'] \
+    		or date in work_calendar['holiday'] \
+    		or date in work_calendar['vacation']:
         return
     week = week_start(date)
     work_time = get_work_time(date)
