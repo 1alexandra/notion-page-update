@@ -1,7 +1,7 @@
 import os
 
 from datetime import datetime, timedelta
-from notion.client import NotionClient
+from fix_notion import notion
 
 
 def find_file(filename):
@@ -26,7 +26,7 @@ def get_client():
         else:
             return None
     try:
-        return NotionClient(token_v2=token)
+        return notion.client.NotionClient(token_v2=token)
     except Exception:
         raise Exception('Error: wrong token_v2')
 
