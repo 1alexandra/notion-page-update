@@ -1,1 +1,1 @@
-clock: python clock_update.py 120
+clock: python clock_update.py 60
