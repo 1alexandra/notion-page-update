@@ -28,7 +28,7 @@ def work_hours_daily(wh_rows):
         timing.append([row.date.start, round(time, 2)])
     timing = pd.DataFrame(timing, columns=['Date', 'Hours'])
     all_dates = pd.date_range(timing.Date.min(), timing.Date.max(), freq='D')
-    all_dates = pd.DataFrame(all_dates, columns=['Date'])
+    all_dates = pd.DataFrame(all_dates.date, columns=['Date'])
     return all_dates.merge(timing, 'left')
 
 

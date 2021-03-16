@@ -20,6 +20,8 @@ for key in work_calendar:
 
 
 def get_work_time(date):
+    if (datetime.now().date() - date).days > 90:
+        return None
     param_request = {
         'key': os.environ['rescue_key'],
         'format': 'json',
@@ -55,6 +57,8 @@ def update_work_hours(cv, rows, date=None, log=False):
         return
     week = week_start(date)
     work_time = get_work_time(date)
+    if work_time is None:
+        return
     kwargs = {
         'title': date.strftime('%d %B %Y, %A'),
         'date': date,
