@@ -39,7 +39,7 @@ def get_cv_rows(client, url):
 
 def update_row(row, kwargs):
     for key, val in kwargs.items():
-        if val:
+        if val is not None:
             try:
                 row.set_property(key, val)
             except Exception:
