@@ -71,4 +71,4 @@ def plot_work_hours(rows):
         ),
     ]
     plotly_setup()
-    py.plot(data, filename='example', sharing='public')
+    py.plot(data, filename='wok_hours', sharing='public')
