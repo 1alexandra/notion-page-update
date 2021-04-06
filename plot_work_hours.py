@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 import chart_studio.plotly as py
 from chart_studio.tools import set_config_file
@@ -71,4 +72,4 @@ def plot_work_hours(rows):
         ),
     ]
     plotly_setup()
-    py.plot(data, filename='wok_hours', sharing='public')
+    py.plot(data, filename=f'woкk_hours_{datetime.now().date()}', sharing='public')
