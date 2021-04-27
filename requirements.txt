@@ -10,3 +10,4 @@ requests
 pandas
 chart_studio
 plotly
+recurring-ical-events

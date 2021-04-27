@@ -9,6 +9,7 @@ URLS:
   WEATHER: https://www.notion.so/zhuav/c1336beefc04453481cc1e597c01ea1c?v=83bb7919bec948f0bd72066f1f153bb7
   WORK_HOURS: https://www.notion.so/zhuav/a069f55bf9164bcb892bb852c778ee0c?v=da9da90c0a004b95802387e52d8c529b
   RESCUE_TIME: https://www.rescuetime.com/anapi/data
+  CALENDAR: https://www.notion.so/zhuav/9a0db81c95b648cd933b72090cd2ccf7?v=f661e474ff7b482f89738687d764e5ac
 work_activities:
   - MS Terminal Services Client
   - Zoom
@@ -18,3 +19,4 @@ work_activities:
   - youtrack.goodsforecast.ru
   - Notepad
   - phoenix2.forecsys.ru
+  - MS Outlook
