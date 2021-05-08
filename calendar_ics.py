@@ -9,6 +9,9 @@ import pandas as pd
 import pytz
 
 
+from work_hours import work_calendar
+
+
 def describe_event(event):
     res = {}
     target_time_zone = pytz.timezone('Europe/Moscow')
@@ -19,7 +22,11 @@ def describe_event(event):
         start_msk = start_msk.astimezone(target_time_zone)
         end_msk = end_msk.astimezone(target_time_zone)
     elif (end_msk-start_msk).days == 1:
+        start_msk = pd.to_datetime(start_msk)
         end_msk = None
+    else:
+        start_msk = pd.to_datetime(start_msk)
+        end_msk = pd.to_datetime(end_msk)
     res['title'] = str(event['SUMMARY'])
     loc = str(event['LOCATION'])
     if ' ' not in loc:
@@ -59,10 +66,17 @@ def add_events(
                 for row in rows if row.date is not None}
     for row in rows:
         if row.source == source \
+                and row.date is not None \
                 and pd.to_datetime(row.date.start) >= start_date:
             row.source = None
     for event in events:
         event = describe_event(event.copy())
+        if event['date'] is None:
+            continue
+        if source == 'outlook' \
+                and pd.to_datetime(event['date'].start).date() \
+                in work_calendar['vacation']:
+            continue
         key = cal_row_key(event['title'], event['date'])
         finded = row_dict[key] if key in row_dict \
             else cv.collection.add_row(title=event['title'])

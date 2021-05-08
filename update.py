@@ -1,3 +1,5 @@
+from socket import gethostname
+
 from notion.block import VideoBlock
 from notion.collection import NotionDate
 
@@ -48,6 +50,15 @@ def update(cv, rows, rss, add_video=False):
         update_row(finded_row, kwargs)
 
 
-def log_result(cv, traceback, start_datetime, finish_datetime, timezone):
-    row = cv.collection.add_row(title=traceback)
-    row.date = NotionDate(start_datetime, finish_datetime, timezone)
+def log_result(cv, rows, traceback, start_datetime, finish_datetime, timezone):
+    title = gethostname()
+    finded_row = None
+    for row in rows:
+        if row.traceback is None or row.traceback == '':
+            row.remove()
+        if row.title == title:
+            finded_row = row
+    if finded_row is None:
+        finded_row = cv.collection.add_row(title=title)
+    finded_row.date = NotionDate(start_datetime, finish_datetime, timezone)
+    finded_row.traceback = traceback

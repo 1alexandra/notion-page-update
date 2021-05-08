@@ -4,6 +4,7 @@ import yaml
 import traceback
 from datetime import datetime, timedelta, timezone
 from apscheduler.schedulers.blocking import BlockingScheduler
+from socket import gethostname
 
 from notion_client import get_client
 from notion_client import get_cv_rows
@@ -54,9 +55,9 @@ def processing(client):
     for source in ['google', 'outlook']:
         cv, rows = get_cv_rows(client, URLS['CALENDAR'])
         add_events(cv, rows, os.environ[f'{source}_ics'])
-
-    cv_h, rows_h = get_cv_rows(client, URLS['WORK_HOURS'])
-    plot_work_hours(rows_h)
+    if gethostname() == 'LAPTOP-6MEALABP':
+        cv_h, rows_h = get_cv_rows(client, URLS['WORK_HOURS'])
+        plot_work_hours(rows_h)
 
 
 @sched.scheduled_job('interval', minutes=minutes)
@@ -73,9 +74,9 @@ def main():
         tb = traceback.format_exc()
     finally:
         print('LOGGING')
-        cv_log = client.get_collection_view(URLS['LOGS_TABLE'])
+        cv_log, rows_log = get_cv_rows(client, URLS['LOGS_TABLE'])
         finish = datetime.now(tz=zone)
-        log_result(cv_log, tb, start, finish, zone)
+        log_result(cv_log, rows_log, tb, start, finish, zone)
 
 
 if __name__ == "__main__":
