@@ -10,7 +10,7 @@ from notion_client import get_client
 from notion_client import get_cv_rows
 from notion_client import get_last_date, update_last_date
 from youtube import get_youtube_urls
-from rss import MangaRSS, SeriesRSS, YouTubeRSS
+from rss import SportsRSS, MangaRSS, SeriesRSS, YouTubeRSS
 from update import update, log_result
 from tody_killer import update_tody, update_private
 from weather import update_weather
@@ -40,6 +40,7 @@ def processing(client):
     cv_h, rows_h = get_cv_rows(client, URLS['WORK_HOURS'])
     last_date = get_last_date(rows)
     update(cv, rows, MangaRSS(last_date), False)
+    update(cv, rows, SportsRSS(URLS['BLOG_RSS'], last_date), False)
     try:
         update(cv, rows, SeriesRSS(last_date), False)
     except Exception:

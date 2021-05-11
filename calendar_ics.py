@@ -12,6 +12,12 @@ import pytz
 from work_hours import work_calendar
 
 
+def find_url(s):
+    link = re.search("(?P<url>https?://[^\s]+)", s) \
+        if s else None
+    return link.group("url") if link else None
+
+
 def describe_event(event):
     res = {}
     target_time_zone = pytz.timezone('Europe/Moscow')
@@ -36,9 +42,7 @@ def describe_event(event):
     except Exception:
         desc = None
     res['description'] = desc
-    link = re.search("(?P<url>https?://[^\s]+)", desc) \
-        if desc else None
-    link = link.group("url") if link else None
+    link = find_url(desc)
     res['link'] = link
     res['location'] = loc if loc else None
     reminder = None  # {'unit': 'minute', 'value': 3}

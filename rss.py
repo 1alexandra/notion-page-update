@@ -2,7 +2,11 @@ import yaml
 
 from datetime import datetime, timedelta
 
+import pandas as pd
+
 from soup import get_soup
+
+from calendar_ics import find_url
 
 
 with open('constants.yaml') as f:
@@ -36,9 +40,14 @@ class BaseRSS:
 
     def get_link(self, el):
         try:
-            return el.link.get('href')
+            link = el.link.get('href')
+            assert link
+            return link
         except Exception:
-            return ''
+            try:
+                return find_url(el.text)
+            except Exception:
+                return ''
 
     def get_season(self, el):
         return None
@@ -139,3 +148,17 @@ class YouTubeRSS(BaseRSS):
     def get_date(self, el):
         return datetime.strptime(el.published.text[:10],
                                  '%Y-%m-%d').date()
+
+
+class SportsRSS(BaseRSS):
+    def __init__(self, url, last_date):
+        super().__init__(url, last_date)
+        self.parent = BaseRSS(url, last_date)
+
+    @savety
+    def get_date(self, el):
+        return pd.to_datetime(el.pubdate.text).date()
+
+    @savety
+    def get_link(self, el):
+        return find_url(el.text)
